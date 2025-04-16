@@ -1,103 +1,104 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+
+const GRID = [
+  ["L", "U", "K", "E", "X", "M", "V", "A", "D", "E", "R", "B", "E", "O"],
+  ["B", "C", "F", "G", "H", "I", "J", "5", "L", "M", "N", "D", "E", "R"],
+  ["6", "O", "D", "A", "P", "Q", "R", "S", "T", "U", "V", "R", "D", "L"],
+  ["W", "X", "B", "Z", "A", "G", "C", "D", "M", "F", "G", "A", "B", "R"],
+  ["H", "A", "N", "A", "Y", "X", "W", "V", "U", "T", "S", "D", "E", "K"],
+  ["A", "B", "C", "C", "R", "R", "G", "D", "2", "J", "S", "N", "W", "R"],
+  ["R", "2", "D", "2", "L", "M", "N", "V", "A", "Q", "O", "G", "E", "M"],
+  ["R", "2", "D", "2", "G", "M", "Q", "O", "T", "R", "L", "D", "W", "R"],
+  ["F", "E", "T", "T", "E", "I", "A", "O", "P", "L", "T", "E", "E", "N"],
+  ["T", "S", "A", "B", "E", "R", "M", "O", "P", "L", "R", "H", "W", "R"],
+  ["T", "S", "A", "B", "E", "R", "M", "D", "O", "O", "K", "U", "W", "R"],
+
+];
+
+const ANSWERS = ["LUKE", "VADER", "YODA", "HAN", "BOBA", "SABER", "SOLO", "R2D2", "DARTH", "LEIA", "FETT", "DOOKU"];
+
+export default function StarWarsCrossword() {
+  const [selectedWord, setSelectedWord] = useState("");
+  const [selectedCoords, setSelectedCoords] = useState([]);
+  const [foundWords, setFoundWords] = useState([]);
+
+  function handleLetterClick(letter, row, col) {
+    const newCoords = [...(selectedCoords || []), [row, col]];
+    const newWord = newCoords.map(([r, c]) => GRID[r][c]).join("");
+
+    if (newCoords.length >= 2) {
+      const [[r1, c1], [r2, c2]] = newCoords;
+      const dr = r2 - r1;
+      const dc = c2 - c1;
+      const isValidLine = newCoords.every(([r, c], i) => r === r1 + i * dr && c === c1 + i * dc);
+      if (!isValidLine) return;
+    }
+
+    setSelectedCoords(newCoords);
+    setSelectedWord(newWord);
+
+    const match = ANSWERS.find(word => word === newWord && !foundWords.includes(word));
+    if (match) {
+      setFoundWords([...foundWords, match]);
+      setSelectedWord("");
+      setSelectedCoords([]);
+    }
+
+  }
+
+  function reset() {
+    setSelectedWord("");
+    setSelectedCoords([]);
+    setFoundWords([]);
+  }
+
+  function deleteLastLetter() {
+    setSelectedWord(prev => prev.slice(0, -1));
+    setSelectedCoords(prev => prev.slice(0, -1));
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-black text-yellow-400 font-mono flex flex-col items-center justify-center gap-4 p-4">
+      <h1 className="text-3xl font-bold tracking-widest">STAR WARS CROSSWORD</h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <div className="grid" style={{ gridTemplateColumns: `repeat(${GRID[0].length}, 2rem)` }}>
+        {GRID.map((row, rIdx) =>
+          row.map((letter, cIdx) => (
+            <div
+              key={`${rIdx}-${cIdx}`}
+              onClick={() => letter && handleLetterClick(letter, rIdx, cIdx)}
+              className={`w-8 h-8 m-0.5 flex items-center justify-center text-lg font-bold border border-yellow-400 select-none cursor-pointer ${letter ? "bg-yellow-900 hover:bg-yellow-700" : "bg-gray-800"}`}
+            >
+              {letter}
+            </div>
+          ))
+        )}
+      </div>
+
+      <div className="text-lg">CHOSEN WORDS: <span className="text-white">{selectedWord}</span></div>
+
+      <div className="mt-4 w-full max-w-md">
+        <h2 className="text-xl mb-2">Find These Words:</h2>
+        <ul className="grid grid-cols-2 gap-2">
+          {ANSWERS.map((word, index) => (
+            <li key={`${word}-${index}`} className="flex items-center gap-2">
+              <input type="checkbox" checked={foundWords.includes(word)} readOnly />
+              <label className={`${foundWords.includes(word) ? "line-through text-gray-400" : ""}`}>{word}</label>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="flex gap-4 mt-6">
+        <button onClick={deleteLastLetter} className="px-4 py-2 bg-yellow-600 text-black rounded hover:bg-yellow-500">
+          Delete Last
+        </button>
+        <button onClick={reset} className="px-4 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-400">
+          Reset
+        </button>
+      </div>
     </div>
   );
 }
